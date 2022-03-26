@@ -6,7 +6,7 @@ public class Main {
 
         String[][] arr = {
                 {"1", "1", "1", "1"},
-                {"2", "2", "2"},
+                {"2", "2", "2", "2"},
                 {"3", "3", "3", "3"},
                 {"4", "4", "4", "4"}};
         method(arr);
@@ -25,6 +25,20 @@ public class Main {
                 throw new MyArraySizeException("Строка " + i + " имеет длину не 4");
             }
         }
+
+        int sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            String[] row = arr[i];
+            for (int j = 0; j < row.length; j++){
+                String el = row[j];
+                int number = Integer.parseInt(el);
+                sum = sum + number;
+            }
+
+        }
+        System.out.println("Сумма массива = " + sum);
+
+
 
     }
 

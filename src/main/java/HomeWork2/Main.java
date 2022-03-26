@@ -6,7 +6,7 @@ public class Main {
 
         String[][] arr = {
                 {"1", "1", "1", "1"},
-                {"2", "2", "2", "2"},
+                {"2", "2", "2"},
                 {"3", "3", "3", "3"},
                 {"4", "4", "4", "4"}};
         method(arr);
@@ -16,11 +16,13 @@ public class Main {
 
     public static void method(String[][] arr) throws MyArraySizeException {
         if (arr.length != 4) {
-            throw new MyArraySizeException();
+            throw new MyArraySizeException("Количесво строк не равно 4!");
         }
-        for (String[] row : arr) {
+        for (int i = 0; i < arr.length; i++) {
+
+            String[] row = arr[i];
             if (row.length != 4) {
-                throw new MyArraySizeException();
+                throw new MyArraySizeException("Строка " + i + " имеет длину не 4");
             }
         }
 

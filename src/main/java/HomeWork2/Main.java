@@ -2,19 +2,27 @@ package HomeWork2;
 
 public class Main {
 
-    public static void main(String[] args) throws MyArraySizeException, MyArrayDataException {
+    public static void main(String[] args) {
 
         String[][] arr = {
                 {"1", "1", "1", "1"},
                 {"2", "2", "2", "2"},
-                {"3", "3", "оопап", "3"},
+                {"3", "3", "3", "3"},
                 {"4", "4", "4", "4"}};
-        method(arr);
-        System.out.println("Работает");
+        try {
+            int sum = method(arr);
+            System.out.println("Сумма массива = " + sum);
+        } catch (MyArraySizeException e) {
+            e.printStackTrace();
+        } catch (MyArrayDataException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 
-    public static void method(String[][] arr) throws MyArraySizeException, MyArrayDataException {
+    public static int method(String[][] arr) throws MyArraySizeException, MyArrayDataException {
         if (arr.length != 4) {
             throw new MyArraySizeException("Количесво строк не равно 4!");
         }
@@ -43,7 +51,7 @@ public class Main {
             }
 
         }
-        System.out.println("Сумма массива = " + sum);
+      return sum;
 
 
 

@@ -3,6 +3,7 @@ package lesson7.project;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lesson7.project.entity.Weather;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -11,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.jws.soap.SOAPBinding;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccuweatherModel implements WeatherModel{
 //    http://dataservice.accuweather.com/forecasts/v1/daily/1day/
@@ -31,6 +34,8 @@ public class AccuweatherModel implements WeatherModel{
 
     private static final OkHttpClient okHttpClient= new OkHttpClient();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private DatadaseRepository datadaseRepository = new DatadaseRepository();
+
 
     @Override
     public void getWeather(String selectedCity, Period period) throws IOException {
@@ -56,9 +61,14 @@ public class AccuweatherModel implements WeatherModel{
                 String weatherResponse = oneDayForecasResponse.body().string();
 //                System.out.println(weatherResponse);
 
-                System.out.println(parseWeatherResponse(selectedCity, weatherResponse, 0));
+                Weather weather = parseWeatherResponse(selectedCity, weatherResponse, 0);
+//                System.out.println(weather);
+
+                datadaseRepository.saveWeatherToDatabase(weather);
 
                 break;
+
+
 
             case FIVE_DAYS:
                 HttpUrl httpUrl1 = new HttpUrl.Builder()
@@ -79,9 +89,15 @@ public class AccuweatherModel implements WeatherModel{
                 Response fiveDayForecasResponse = okHttpClient.newCall(request1).execute();
                 String weatherResponse1 = fiveDayForecasResponse.body().string();
 //                System.out.println(weatherResponse1);
+
+                List<Weather> weatherList = new ArrayList<>();
+
+
                 for (int i = 0; i < 5; i++) {
-                    System.out.println(parseWeatherResponse(selectedCity, weatherResponse1, i));
+                    Weather w = parseWeatherResponse(selectedCity, weatherResponse1, i);
+                    weatherList.add(w);
                 }
+                datadaseRepository.saveWeatherToDatabase(weatherList);
 
                 break;
         }
@@ -117,6 +133,12 @@ public class AccuweatherModel implements WeatherModel{
         return cityKey;
     }
 
+    @Override
+    public List<Weather> getSavedToDBWeather() {
+        return datadaseRepository.getSavedToDBWeather();
+
+    }
+
     public static void main(String[] args) throws IOException {
 
         //WeatherResponse weatherResponse = parseWeatherResponse("Piter", response);
@@ -129,10 +151,11 @@ public class AccuweatherModel implements WeatherModel{
         UserInterfaceView userInterfaceView = new UserInterfaceView();
         userInterfaceView.runInterface();
 
+
     }
 
     @NotNull
-    private static WeatherResponse parseWeatherResponse(String city, String response, int day) throws JsonProcessingException {
+    private static Weather parseWeatherResponse(String city, String response, int day) throws JsonProcessingException {
         String date = objectMapper.readTree(response).get("DailyForecasts").get(day).get("Date").asText();
 
         JsonNode temperatureBlock = objectMapper.readTree(response).get("DailyForecasts").get(day).get("Temperature").get("Minimum");
@@ -155,6 +178,6 @@ public class AccuweatherModel implements WeatherModel{
             weatherText = "sunny";
         }
 
-        return new WeatherResponse(city, date, temperatureNumber + " " + temperatureUnit, weatherText);
+        return new Weather(city, date, temperatureNumber);
     }
 }
